@@ -9,6 +9,7 @@
 #import "CZScrollTabView.h"
 #import "CZScrollTabItemView.h"
 #import <CZCategory/NSString+CZCategory.h>
+#import <CZCategory/UIView+CZCategory.h>
 
 @interface CZScrollTabView ()<UITableViewDelegate, UITableViewDataSource>
 
@@ -64,6 +65,7 @@
         _tableView.scrollEnabled = !self.isAverage;
         _tableView.showsVerticalScrollIndicator = NO;
         _tableView.showsHorizontalScrollIndicator = NO;
+        _tableView.backgroundColor = [UIColor redColor];
         [self addSubview:_tableView];
     }
     return _tableView;
@@ -74,14 +76,14 @@
 {
     if (self.isHorizontal) {
         if (self.isAverage) {
-            return self.frame.size.width/self.dataArray.count;
+            return self.width/self.dataArray.count;
         } else {
             NSString * text = self.dataArray[indexPath.row];
             CGSize textSize = [text getTextActualSize:self.customFont lines:0 maxWidth:[UIScreen mainScreen].bounds.size.width];
             return textSize.width + self.itemSpace*2;
         }
     } else {
-        return self.isAverage ? (self.frame.size.height/self.dataArray.count) : 50;
+        return self.isAverage ? (self.height/self.dataArray.count) : 50;
     }
 }
 
@@ -112,13 +114,14 @@
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         // 非旋转情况下
         if (!(self.isHorizontal && !self.isAverage)) {
-            cell.frame = CGRectMake(cell.frame.origin.x, cell.frame.origin.y, self.isHorizontal ? self.frame.size.height : self.frame.size.width, [self getCellHeight:indexPath]);
+            cell.frame = CGRectMake(cell.x, cell.y, self.isHorizontal ? self.height : self.width, [self getCellHeight:indexPath]);
             cell.contentView.frame = cell.bounds;
         }
         CZScrollTabItemView * view = nil;
         // 创建内容视图
-        if (self.delegate && [self.delegate respondsToSelector:@selector(scrollTabItemViewAtIndex:text:)]) {
-            view = [self.delegate scrollTabItemViewAtIndex:indexPath.row text:text];
+        if (self.delegate && [self.delegate respondsToSelector:@selector(scrollTabItemViewAtIndex:text:contentSize:)]) {
+            CGSize contentSize = (self.isHorizontal && !self.isAverage) ? CGSizeMake(cell.contentView.height, cell.contentView.width) : CGSizeMake(cell.contentView.width, cell.contentView.height);
+            view = [self.delegate scrollTabItemViewAtIndex:indexPath.row text:text contentSize:contentSize];
         } else {
             view = [[CZScrollTabItemView alloc] init];
         }
@@ -129,11 +132,11 @@
     CZScrollTabItemView * view = [self getItemView:cell];
     // 旋转情况下
     if (self.isHorizontal && !self.isAverage) {
-        cell.frame = CGRectMake(0, 0, self.frame.size.height, [self getCellHeight:indexPath]);
+        cell.frame = CGRectMake(0, 0, self.height, [self getCellHeight:indexPath]);
         cell.contentView.frame = cell.bounds;
-        view.frame = CGRectMake(0, 0, cell.contentView.frame.size.height, cell.contentView.frame.size.width);
+        view.frame = CGRectMake(0, 0, cell.contentView.height, cell.contentView.width);
     } else {
-        view.frame = CGRectMake(0, 0, cell.contentView.frame.size.width, cell.contentView.frame.size.height);
+        view.frame = CGRectMake(0, 0, cell.contentView.width, cell.contentView.height);
     }
     view.textLabel.text = text;
     if (indexPath.row == self.selectedIndex) view.isSelected = YES;
