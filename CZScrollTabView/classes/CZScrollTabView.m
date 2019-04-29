@@ -8,8 +8,8 @@
 
 #import "CZScrollTabView.h"
 #import "CZScrollTabItemView.h"
-#import <CZCategory/NSString+CZCategory.h>
-#import <CZCategory/UIView+CZCategory.h>
+#import <CZCategorys/NSString+CZCategory.h>
+#import <CZCategorys/UIView+CZCategory.h>
 
 @interface CZScrollTabView ()<UITableViewDelegate, UITableViewDataSource>
 
@@ -65,7 +65,6 @@
         _tableView.scrollEnabled = !self.isAverage;
         _tableView.showsVerticalScrollIndicator = NO;
         _tableView.showsHorizontalScrollIndicator = NO;
-        _tableView.backgroundColor = [UIColor redColor];
         [self addSubview:_tableView];
     }
     return _tableView;
